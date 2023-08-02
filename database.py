@@ -11,9 +11,8 @@ Record = Union[str, Dict, int, List, str]
 COLUMNS_NAMES = ("key", "api_route", "output", "status_code", "http_methods")
 
 # DATABASE SETTING
-API_RECORDER_SECRETS = st.secrets["API_RECORDER"]["DETA_DB_INFO"]
-deta = Deta(API_RECORDER_SECRETS[0])
-db = deta.Base(API_RECORDER_SECRETS[1])
+deta = Deta(st.secrets["API_RECORDER"]["DETA_KEY"])
+db = deta.Base(st.secrets["API_RECORDER"]["DETA_BASE"])
 
 
 def insert_api_record(api_record: Any) -> Any:
