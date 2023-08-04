@@ -12,7 +12,7 @@ UNKNOWN_HTTP_METHODS = []
 ##############################################################################
 #                                   Types                                    #
 ##############################################################################
-Record = Union[str, Dict, int, List, str]
+Record = Union[str, Dict, int, List]
 
 
 def is_url_format_valid(url: str) -> bool:
@@ -32,7 +32,7 @@ def get_supported_http_methods(api_route: str) -> List[str]:
         return UNKNOWN_HTTP_METHODS
 
 
-def create_api_record(api_route: str) -> Record:
+def create_api_record(api_route: str) -> Dict[str, Record]:
     """Create a comprehensive record for the given API routing. If the provided
     API isn't a valid URL or the server didn't accept the request, raise a
     ValueError message with the corresponding error."""
@@ -40,13 +40,18 @@ def create_api_record(api_route: str) -> Record:
         raise ValueError("Given API in not a valid URL")
 
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    https_methods = get_supported_http_methods(api_route)
+    http_methods = get_supported_http_methods(api_route)
 
     try:
         response = requests.get(api_route)
-        https_methods = ["GET"] if not https_methods else https_methods
-        return current_time, api_route, response.json(), response.status_code,\
-            https_methods
+        # If the server does not allow the OPTIONS method, the only known option
+        # is GET method
+        http_methods = ["GET"] if not http_methods else http_methods
+        return {"key": current_time,
+                "api_route": api_route,
+                "output": response.json(),
+                "status_code": response.status_code,
+                "http_methods": http_methods}
 
     except requests.exceptions.RequestException:
         return ValueError("A problem occurred during the request")

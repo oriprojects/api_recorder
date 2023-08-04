@@ -5,6 +5,10 @@ import pandas as pd
 from streamlit_option_menu import option_menu
 from database import *
 from endpoints_records import create_api_record
+##############################################################################
+#                                   Globals                                  #
+##############################################################################
+API_COLUMN_FIELD = "api_route"
 
 # PAGE SETTINGS
 page_title = "API Recorder"
@@ -22,12 +26,12 @@ selected_option = option_menu(
 )
 
 
-def display_records(records):
+def display_records(records: List[Record]) -> None:
     """Display a table that contains the requested records"""
     st.table(pd.DataFrame(records))
 
 
-def upload_route_record_to_db(route):
+def upload_route_record_to_db(route: str) -> None:
     """Upload an API record to the database. If the record exists, display a
      table of shared API routing records. Otherwise, raise ValueError with a
      relevant error."""
@@ -36,7 +40,7 @@ def upload_route_record_to_db(route):
         record = create_api_record(route)
         save_api_record(record)
         st.subheader("API records")
-        display_records(get_records_by_route(route))
+        display_records(get_records_by_column_value(API_COLUMN_FIELD, route))
 
     except ValueError as error:
         st.error(error)
@@ -51,7 +55,7 @@ if __name__ == '__main__':
             submit_button = st.form_submit_button("Save")
 
             if submit_button:
-                upload_route_record_to_db(api_route)
+                upload_route_record_to_db(api_route.strip())
     else:
         st.subheader("Database Records")
         display_records(fetch_all_records())
