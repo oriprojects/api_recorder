@@ -15,18 +15,17 @@ deta = Deta(st.secrets["API_RECORDER"]["DETA_KEY"])
 db = deta.Base(st.secrets["API_RECORDER"]["DETA_BASE"])
 
 
-def insert_api_record(api_record: Any) -> Any:
-    """Returns the report on a successful entity creation,
-     otherwise raises an error"""
+def save_api_record(api_record: Any) -> Any:
+    """Return a response for the entity creation. Otherwise, raise an error"""
     return db.put(dict(zip(COLUMNS_NAMES, api_record)))
 
 
 def fetch_all_records() -> List[Record]:
-    """Return a dictionary of all api records"""
+    """Return a dictionary of all API records."""
     return db.fetch().items
 
 
 def get_records_by_route(route: str) -> List[Record]:
-    """Returns a dictionary of api records with a specific api routing"""
+    """Return a dictionary of API records with a specific API routing."""
     return [record for record in fetch_all_records()
             if record.get("api_route") == route]
